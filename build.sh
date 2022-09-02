@@ -14,11 +14,12 @@ GIT_TOKEN="${5}"
 # Apps.
 date="$( command -v date )"
 git="$( command -v git )"
+hash="$( command -v rhash )"
+mkdir="$( command -v mkdir )"
 mv="$( command -v mv )"
 rm="$( command -v rm )"
-tar="$( command -v tar )"
-tee="$( command -v tee )"
 sum="$( command -v sha256sum )"
+tar="$( command -v tar )"
 ts="$( _timestamp )"
 ver="$( _version )"
 
@@ -37,10 +38,10 @@ ${git} config --global init.defaultBranch 'main'
 
 init() {
   git_clone \
-    && ( ( pkg_orig_pack && pkg_src_build && pkg_src_move ) 2>&1 ) | ${tee} "${d_src}/build.log" \
-    && git_push \
-    && obs_upload \
-    && obs_trigger
+    && pkg_pack \
+    && pkg_move \
+    && pkg_sum \
+    && git_push
 }
 
 # -------------------------------------------------------------------------------------------------------------------- #
@@ -67,18 +68,19 @@ git_clone() {
 # SYSTEM: PACKING FILES.
 # -------------------------------------------------------------------------------------------------------------------- #
 
-pkg_orig_pack() {
+pkg_pack() {
   echo "--- [SYSTEM] PACKING"
   _pushd "${d_src}" || exit 1
 
   # Set package version.
-  PKG_VER="${ver}"
-  SOURCE="*"
-  TARGET="${OBS_PACKAGE}.${PKG_VER}.tar.xz"
-  ${tar} -cJf "${TARGET}" "${SOURCE}"
-  echo "File '${TARGET}' created!"
+  local PKG_VER="${ver}"
+  local PKG_DIR="${GIT_REPO_DST}_${PKG_VER}"
+  local PKG_TAR="${PKG_DIR}.tar.xz"
 
-  ${sum} "${TARGET}" > "${TARGET}.sha256"
+  ${mkdir} -p "${PKG_DIR}" \
+    && ${mv} -f "*" "${PKG_DIR}"
+  ${tar} -cJf "${PKG_TAR}" "${PKG_DIR}"
+  ${sum} "${PKG_TAR}" > "${PKG_TAR}.sha256"
 
   _popd || exit 1
 }
@@ -87,7 +89,7 @@ pkg_orig_pack() {
 # SYSTEM: MOVE PACKAGE TO CMF PACKAGE STORE REPOSITORY.
 # -------------------------------------------------------------------------------------------------------------------- #
 
-pkg_src_move() {
+pkg_move() {
   echo "--- [SYSTEM] MOVE: '${d_src}' -> '${d_dst}'"
 
   # Remove old files from 'd_dst'.
@@ -96,13 +98,29 @@ pkg_src_move() {
 
   # Move new files from 'd_src' to 'd_dst'.
   echo "Moving new files to repository..."
-  for i in README.md LICENSE *.tar.* *.log; do
+  for i in README.md LICENSE *.tar.*; do
     ${mv} -fv "${d_src}"/${i} "${d_dst}" || exit 1
   done
 }
 
 # -------------------------------------------------------------------------------------------------------------------- #
-# GIT: PUSH PACKAGE TO DEBIAN PACKAGE STORE REPOSITORY.
+# SYSTEM: CHECKSUM.
+# -------------------------------------------------------------------------------------------------------------------- #
+
+pkg_sum() {
+  echo "--- [HASH] CHECKSUM FILES"
+  _pushd "${d_dst}" || exit 1
+
+  for i in *; do
+    echo "Checksum '${i}'..."
+    [[ -f "${i}" ]] && ${hash} -u "${OBS_PACKAGE}.sha3-256" --sha3-256 "${i}"
+  done
+
+  _popd || exit 1
+}
+
+# -------------------------------------------------------------------------------------------------------------------- #
+# GIT: PUSH PACKAGE TO PACKAGE STORE REPOSITORY.
 # -------------------------------------------------------------------------------------------------------------------- #
 
 git_push() {
@@ -137,7 +155,7 @@ _timestamp() {
   ${date} -u '+%Y-%m-%d %T'
 }
 
-# Pkg version.
+# Package version.
 _version() {
   ${date} -u '+%Y-%m-%d.%H-%M-%S'
 }
