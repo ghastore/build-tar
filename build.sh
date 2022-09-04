@@ -75,7 +75,7 @@ pkg_pack() {
   echo "--- [SYSTEM] PACKING"
   _pushd "${d_src}" || exit 1
 
-  # Set package version.
+  # Set TAR version.
   local PKG_VER="${ver}"
   local PKG_DIR="${GIT_REPO_DST}_${PKG_VER}"
   local PKG_TAR="${PKG_DIR}.tar.xz"

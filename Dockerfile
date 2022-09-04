@@ -1,6 +1,6 @@
 FROM alpine
 
-LABEL "name"="TAR Package Builder"
+LABEL "name"="TAR Builder"
 LABEL "description"=""
 LABEL "maintainer"="z17 CX <mail@z17.cx>"
 LABEL "repository"="https://github.com/ghastore/store-pkg-build.git"
