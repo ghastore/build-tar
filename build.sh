@@ -41,9 +41,9 @@ init() {
 
   # Run.
   git_clone \
-    && pkg_pack \
-    && pkg_move \
-    && pkg_sum \
+    && tar_pack \
+    && tar_move \
+    && tar_sum \
     && git_push
 }
 
@@ -71,21 +71,21 @@ git_clone() {
 # SYSTEM: PACKING FILES.
 # -------------------------------------------------------------------------------------------------------------------- #
 
-pkg_pack() {
+tar_pack() {
   echo "--- [SYSTEM] PACKING"
   _pushd "${d_src}" || exit 1
 
   # Set TAR version.
-  local PKG_VER="${ver}"
-  local PKG_DIR="${GIT_REPO_DST}_${PKG_VER}"
-  local PKG_TAR="${PKG_DIR}.tar.xz"
+  local TAR_VER="${ver}"
+  local TAR_DIR; TAR_DIR="$( echo "${GIT_REPO_DST}" | awk -F '[/.]' '{ print $6 }' )_${TAR_VER}"
+  local TAR_NAME="${TAR_DIR}.tar.xz"
 
-  ${mkdir} -p "${PKG_DIR}" \
-    && ${mv} -f "*" "${PKG_DIR}"
-  ${tar} -cJf "${PKG_TAR}" "${PKG_DIR}"
-  ${sum} "${PKG_TAR}" > "${PKG_TAR}.sha256"
+  ${mkdir} -p "${TAR_DIR}" \
+    && ${mv} -f "*" "${TAR_DIR}"
+  ${tar} -cJf "${TAR_NAME}" "${TAR_DIR}"
+  ${sum} "${TAR_NAME}" > "${TAR_NAME}.sha256"
 
-  echo "${PKG_DIR} /// ${PKG_TAR}"
+  echo "${TAR_DIR} /// ${TAR_NAME}"
 
   _popd || exit 1
 }
@@ -94,7 +94,7 @@ pkg_pack() {
 # SYSTEM: MOVE TAR TO TAR STORE REPOSITORY.
 # -------------------------------------------------------------------------------------------------------------------- #
 
-pkg_move() {
+tar_move() {
   echo "--- [SYSTEM] MOVE: '${d_src}' -> '${d_dst}'"
 
   # Remove old files from 'd_dst'.
@@ -112,7 +112,7 @@ pkg_move() {
 # SYSTEM: CHECKSUM.
 # -------------------------------------------------------------------------------------------------------------------- #
 
-pkg_sum() {
+tar_sum() {
   echo "--- [HASH] CHECKSUM FILES"
   _pushd "${d_dst}" || exit 1
 
