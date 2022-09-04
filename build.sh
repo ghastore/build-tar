@@ -106,8 +106,8 @@ move() {
 
   # Copy GitHub Action 'mirror.yml' from 'd_src' to 'd_dst'.
   echo "Copy GitHub Action 'mirror.yml' to repository..."
-  ${mkdir} -p "${d_dst}/.github/workflows" && \
-    ${cp} "${d_src}/.github/workflows/mirror.yml" "${d_dst}/.github/workflows/"
+  ${mkdir} -p "${d_dst}/.github/workflows" \
+    && ${cp} "${d_src}/.github/workflows/mirror.yml" "${d_dst}/.github/workflows/"
 }
 
 # -------------------------------------------------------------------------------------------------------------------- #
