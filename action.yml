@@ -1,6 +1,6 @@
-name: "CMF Package Builder"
+name: "TAR Package Builder"
 author: "z17 CX <mail@z17.cx>"
-description: "GitHub Action for build CMF source package."
+description: "GitHub Action for build TAR package."
 branding:
   icon: "archive"
   color: "blue"

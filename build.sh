@@ -20,8 +20,6 @@ mv="$( command -v mv )"
 rm="$( command -v rm )"
 sum="$( command -v sha256sum )"
 tar="$( command -v tar )"
-ts="$( _timestamp )"
-ver="$( _version )"
 
 # Dirs.
 d_src="/root/git/repo_src"
@@ -37,6 +35,11 @@ ${git} config --global init.defaultBranch 'main'
 # -------------------------------------------------------------------------------------------------------------------- #
 
 init() {
+  # Functions.
+  ts="$( _timestamp )"
+  ver="$( _version )"
+
+  # Run.
   git_clone \
     && pkg_pack \
     && pkg_move \
