@@ -12,11 +12,12 @@ GIT_EMAIL="${4}"
 GIT_TOKEN="${5}"
 
 # Apps.
+cp="$( command -v cp )"
 date="$( command -v date )"
 git="$( command -v git )"
 hash="$( command -v rhash )"
 mkdir="$( command -v mkdir )"
-cp="$( command -v cp )"
+mv="$( command -v mv )"
 rm="$( command -v rm )"
 tar="$( command -v tar )"
 
