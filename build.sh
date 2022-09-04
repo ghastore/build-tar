@@ -18,12 +18,12 @@ hash="$( command -v rhash )"
 mkdir="$( command -v mkdir )"
 mv="$( command -v mv )"
 rm="$( command -v rm )"
-sum="$( command -v sha256sum )"
 tar="$( command -v tar )"
 
 # Dirs.
 d_src="/root/git/repo_src"
 d_dst="/root/git/repo_dst"
+name="$( echo "${GIT_REPO_DST}" | awk -F '[/.]' '{ print $6 }' )"
 
 # Git config.
 ${git} config --global user.name "${GIT_USER}"
@@ -40,18 +40,18 @@ init() {
   ver="$( _version )"
 
   # Run.
-  git_clone \
-    && tar_pack \
-    && tar_move \
-    && tar_sum \
-    && git_push
+  clone \
+    && pack \
+    && move \
+    && sum \
+    && push
 }
 
 # -------------------------------------------------------------------------------------------------------------------- #
 # GIT: CLONE REPOSITORIES.
 # -------------------------------------------------------------------------------------------------------------------- #
 
-git_clone() {
+clone() {
   echo "--- [GIT] CLONE: ${GIT_REPO_SRC#https://} & ${GIT_REPO_DST#https://}"
 
   local src="https://${GIT_USER}:${GIT_TOKEN}@${GIT_REPO_SRC#https://}"
@@ -71,21 +71,19 @@ git_clone() {
 # SYSTEM: PACKING FILES.
 # -------------------------------------------------------------------------------------------------------------------- #
 
-tar_pack() {
+pack() {
   echo "--- [SYSTEM] PACKING"
   _pushd "${d_src}" || exit 1
 
   # Set TAR version.
-  local tar_ver="${ver}"
-  local tar_dir; tar_dir="$( echo "${GIT_REPO_DST}" | awk -F '[/.]' '{ print $6 }' )_${tar_ver}"
-  local tar_name="${tar_dir}.tar.xz"
+  local dir="${name}_${ver}"
+  local name="${dir}.tar.xz"
 
-  ${mkdir} -p "${tar_dir}" \
-    && ${mv} -f "*" "${tar_dir}"
-  ${tar} -cJf "${tar_name}" "${tar_dir}"
-  ${sum} "${tar_name}" > "${tar_name}.sha256"
+  ${mkdir} -p "${dir}" \
+    && ${mv} -f "*" "${dir}"
+  ${tar} -cJf "${name}" "${dir}"
 
-  echo "${tar_dir} /// ${tar_name}"
+  echo "${dir} /// ${name}"
 
   _popd || exit 1
 }
@@ -94,7 +92,7 @@ tar_pack() {
 # SYSTEM: MOVE TAR TO TAR STORE REPOSITORY.
 # -------------------------------------------------------------------------------------------------------------------- #
 
-tar_move() {
+move() {
   echo "--- [SYSTEM] MOVE: '${d_src}' -> '${d_dst}'"
 
   # Remove old files from 'd_dst'.
@@ -112,13 +110,13 @@ tar_move() {
 # SYSTEM: CHECKSUM.
 # -------------------------------------------------------------------------------------------------------------------- #
 
-tar_sum() {
+sum() {
   echo "--- [HASH] CHECKSUM FILES"
   _pushd "${d_dst}" || exit 1
 
   for i in *; do
     echo "Checksum '${i}'..."
-    [[ -f "${i}" ]] && ${hash} -u "${OBS_PACKAGE}.sha3-256" --sha3-256 "${i}"
+    [[ -f "${i}" ]] && ${hash} -u "${name}.sha3-256" --sha3-256 "${i}"
   done
 
   _popd || exit 1
@@ -128,7 +126,7 @@ tar_sum() {
 # GIT: PUSH TAR TO TAR STORE REPOSITORY.
 # -------------------------------------------------------------------------------------------------------------------- #
 
-git_push() {
+push() {
   echo "--- [GIT] PUSH: '${d_dst}' -> '${GIT_REPO_DST#https://}'"
   _pushd "${d_dst}" || exit 1
 
