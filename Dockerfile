@@ -7,6 +7,6 @@ LABEL "repository"="https://github.com/ghastore/store-pkg-build.git"
 LABEL "homepage"="https://github.com/ghastore"
 
 COPY *.sh /
-RUN apk add --no-cache bash curl git git-lfs rhash
+RUN apk add --no-cache bash curl git git-lfs rhash xz
 
 ENTRYPOINT ["/entrypoint.sh"]
