@@ -80,7 +80,7 @@ pack() {
   local name="${dir}.tar.xz"
 
   ${mkdir} -p "${dir}" \
-    && ${mv} -f "*" "${dir}"
+    && ${mv} -f ./* "${dir}"
   ${tar} -cJf "${name}" "${dir}"
 
   echo "${dir} /// ${name}"
