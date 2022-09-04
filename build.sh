@@ -16,7 +16,7 @@ date="$( command -v date )"
 git="$( command -v git )"
 hash="$( command -v rhash )"
 mkdir="$( command -v mkdir )"
-mv="$( command -v mv )"
+cp="$( command -v cp )"
 rm="$( command -v rm )"
 tar="$( command -v tar )"
 
@@ -80,7 +80,7 @@ pack() {
   local name="${dir}.tar.xz"
 
   ${mkdir} -p "${dir}" \
-    && ${mv} -f ./* "${dir}"
+    && ${cp} -R ./* "${dir}"
   ${tar} -cJf "${name}" "${dir}"
 
   echo "${dir} /// ${name}"
