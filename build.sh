@@ -85,6 +85,8 @@ pkg_pack() {
   ${tar} -cJf "${PKG_TAR}" "${PKG_DIR}"
   ${sum} "${PKG_TAR}" > "${PKG_TAR}.sha256"
 
+  echo "${PKG_DIR} /// ${PKG_TAR}"
+
   _popd || exit 1
 }
 
