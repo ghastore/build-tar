@@ -1,6 +1,6 @@
 FROM debian:stable
 
-LABEL "name"="CMF Build Package"
+LABEL "name"="CMF Package Builder"
 LABEL "description"=""
 LABEL "maintainer"="z17 CX <mail@z17.cx>"
 LABEL "repository"="https://github.com/ghastore/cmfstore-pkg-build.git"
