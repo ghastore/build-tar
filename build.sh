@@ -10,6 +10,7 @@ GIT_REPO_DST="${2}"
 GIT_USER="${3}"
 GIT_EMAIL="${4}"
 GIT_TOKEN="${5}"
+NAME="$( echo "${GIT_REPO_DST}" | awk -F '[/.]' '{ print $6 }' )"
 
 # Apps.
 cp="$( command -v cp )"
@@ -24,7 +25,6 @@ tar="$( command -v tar )"
 # Dirs.
 d_src="/root/git/repo_src"
 d_dst="/root/git/repo_dst"
-name="$( echo "${GIT_REPO_DST}" | awk -F '[/.]' '{ print $6 }' )"
 
 # Git config.
 ${git} config --global user.name "${GIT_USER}"
@@ -77,7 +77,7 @@ pack() {
   _pushd "${d_src}" || exit 1
 
   # Set TAR version.
-  local dir="${name}.${ver}"
+  local dir="${NAME}.${ver}"
   local name="${dir}.tar.xz"
 
   ${mkdir} -p "${dir}" \
@@ -115,7 +115,7 @@ sum() {
 
   for i in *; do
     echo "Checksum '${i}'..."
-    [[ -f "${i}" ]] && ${hash} -u "${name}.sha3-256" --sha3-256 "${i}"
+    [[ -f "${i}" ]] && ${hash} -u "${NAME}.sha3-256" --sha3-256 "${i}"
   done
 
   _popd || exit 1
