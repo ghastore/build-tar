@@ -103,6 +103,11 @@ move() {
   for i in README.md LICENSE *.tar.*; do
     ${mv} -fv "${d_src}"/${i} "${d_dst}" || exit 1
   done
+
+  # Copy GitHub Action 'mirror.yml' from 'd_src' to 'd_dst'.
+  echo "Copy GitHub Action 'mirror.yml' to repository..."
+  ${mkdir} -p "${d_dst}/.github/workflows" && \
+    ${cp} "${d_src}/.github/workflows/mirror.yml" "${d_dst}/.github/workflows/"
 }
 
 # -------------------------------------------------------------------------------------------------------------------- #
