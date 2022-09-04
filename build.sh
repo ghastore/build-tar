@@ -54,8 +54,8 @@ init() {
 git_clone() {
   echo "--- [GIT] CLONE: ${GIT_REPO_SRC#https://} & ${GIT_REPO_DST#https://}"
 
-  SRC="https://${GIT_USER}:${GIT_TOKEN}@${GIT_REPO_SRC#https://}"
-  DST="https://${GIT_USER}:${GIT_TOKEN}@${GIT_REPO_DST#https://}"
+  local SRC="https://${GIT_USER}:${GIT_TOKEN}@${GIT_REPO_SRC#https://}"
+  local DST="https://${GIT_USER}:${GIT_TOKEN}@${GIT_REPO_DST#https://}"
 
   ${git} clone "${SRC}" "${d_src}" \
     && ${git} clone "${DST}" "${d_dst}"
@@ -89,7 +89,7 @@ pkg_pack() {
 }
 
 # -------------------------------------------------------------------------------------------------------------------- #
-# SYSTEM: MOVE PACKAGE TO CMF PACKAGE STORE REPOSITORY.
+# SYSTEM: MOVE TAR TO TAR STORE REPOSITORY.
 # -------------------------------------------------------------------------------------------------------------------- #
 
 pkg_move() {
@@ -123,7 +123,7 @@ pkg_sum() {
 }
 
 # -------------------------------------------------------------------------------------------------------------------- #
-# GIT: PUSH PACKAGE TO PACKAGE STORE REPOSITORY.
+# GIT: PUSH TAR TO TAR STORE REPOSITORY.
 # -------------------------------------------------------------------------------------------------------------------- #
 
 git_push() {
@@ -158,7 +158,7 @@ _timestamp() {
   ${date} -u '+%Y-%m-%d %T'
 }
 
-# Package version.
+# TAR version.
 _version() {
   ${date} -u '+%Y-%m-%d.%H-%M-%S'
 }
