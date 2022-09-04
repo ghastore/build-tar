@@ -77,14 +77,12 @@ pack() {
   _pushd "${d_src}" || exit 1
 
   # Set TAR version.
-  local dir="${name}_${ver}"
+  local dir="${name}.${ver}"
   local name="${dir}.tar.xz"
 
   ${mkdir} -p "${dir}" \
     && ${cp} -RT . "${dir}"
   ${tar} -cJf "${name}" "${dir}"
-
-  echo "${dir} /// ${name}"
 
   _popd || exit 1
 }
