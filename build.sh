@@ -54,11 +54,11 @@ init() {
 git_clone() {
   echo "--- [GIT] CLONE: ${GIT_REPO_SRC#https://} & ${GIT_REPO_DST#https://}"
 
-  local SRC="https://${GIT_USER}:${GIT_TOKEN}@${GIT_REPO_SRC#https://}"
-  local DST="https://${GIT_USER}:${GIT_TOKEN}@${GIT_REPO_DST#https://}"
+  local src="https://${GIT_USER}:${GIT_TOKEN}@${GIT_REPO_SRC#https://}"
+  local dst="https://${GIT_USER}:${GIT_TOKEN}@${GIT_REPO_DST#https://}"
 
-  ${git} clone "${SRC}" "${d_src}" \
-    && ${git} clone "${DST}" "${d_dst}"
+  ${git} clone "${src}" "${d_src}" \
+    && ${git} clone "${dst}" "${d_dst}"
 
   echo "--- [GIT] LIST: '${d_src}'"
   ls -1 "${d_src}"
@@ -76,16 +76,16 @@ tar_pack() {
   _pushd "${d_src}" || exit 1
 
   # Set TAR version.
-  local TAR_VER="${ver}"
-  local TAR_DIR; TAR_DIR="$( echo "${GIT_REPO_DST}" | awk -F '[/.]' '{ print $6 }' )_${TAR_VER}"
-  local TAR_NAME="${TAR_DIR}.tar.xz"
+  local tar_ver="${ver}"
+  local tar_dir; tar_dir="$( echo "${GIT_REPO_DST}" | awk -F '[/.]' '{ print $6 }' )_${tar_ver}"
+  local tar_name="${tar_dir}.tar.xz"
 
-  ${mkdir} -p "${TAR_DIR}" \
-    && ${mv} -f "*" "${TAR_DIR}"
-  ${tar} -cJf "${TAR_NAME}" "${TAR_DIR}"
-  ${sum} "${TAR_NAME}" > "${TAR_NAME}.sha256"
+  ${mkdir} -p "${tar_dir}" \
+    && ${mv} -f "*" "${tar_dir}"
+  ${tar} -cJf "${tar_name}" "${tar_dir}"
+  ${sum} "${tar_name}" > "${tar_name}.sha256"
 
-  echo "${TAR_DIR} /// ${TAR_NAME}"
+  echo "${tar_dir} /// ${tar_name}"
 
   _popd || exit 1
 }
