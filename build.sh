@@ -20,6 +20,7 @@ hash="$( command -v rhash )"
 mkdir="$( command -v mkdir )"
 mv="$( command -v mv )"
 rm="$( command -v rm )"
+sleep="$( command -v sleep )"
 tar="$( command -v tar )"
 
 # Dirs.
@@ -37,8 +38,8 @@ ${git} config --global init.defaultBranch 'main'
 
 init() {
   # Functions.
-  ts="$( _timestamp )"
-  ver="$( _version )"
+  ts_date="$( _ts_date )"
+  ts_ver="$( _ts_ver )"
 
   # Run.
   clone \
@@ -61,11 +62,21 @@ clone() {
   ${git} clone "${src}" "${d_src}" \
     && ${git} clone "${dst}" "${d_dst}"
 
-  echo "--- [GIT] LIST: '${d_src}'"
-  ls -1 "${d_src}"
+  if [[ -d "${d_src}" ]] && [[ "$( ls -a ${d_src} )" ]]; then
+    echo "--- [GIT] LIST: '${d_src}'"; ls -1 "${d_src}"
+  else
+    echo "ERROR: Directory ${d_src} not exist or empty!"
+    exit 1
+  fi
 
-  echo "--- [GIT] LIST: '${d_dst}'"
-  ls -1 "${d_dst}"
+  if [[ -d "${d_dst}" ]] && [[ "$( ls -a ${d_dst} )" ]]; then
+    echo "--- [GIT] LIST: '${d_dst}'"; ls -1 "${d_dst}"
+  else
+    echo "ERROR: Directory ${d_dst} not exist or empty!"
+    exit 1
+  fi
+
+  ${sleep} 2
 }
 
 # -------------------------------------------------------------------------------------------------------------------- #
@@ -77,7 +88,7 @@ pack() {
   _pushd "${d_src}" || exit 1
 
   # Set TAR version.
-  local dir="${NAME}.${ver}"
+  local dir="${NAME}.${ts_ver}"
   local name="${dir}.tar.xz"
 
   ${mkdir} -p "${dir}" \
@@ -120,7 +131,7 @@ sum() {
 
   for i in *; do
     echo "Checksum '${i}'..."
-    [[ -f "${i}" ]] && ${hash} -u "${NAME}.sha3-256" --sha3-256 "${i}"
+    [[ -f "${i}" ]] && ${hash} -u "${NAME}.${ts_ver}.sha3-256" --sha3-256 "${i}"
   done
 
   _popd || exit 1
@@ -136,11 +147,24 @@ push() {
 
   # Commit build files & push.
   echo "Commit build files & push..."
-  ${git} add . \
-    && ${git} commit -a -m "BUILD: ${ts}" \
-    && ${git} push
+  push_response=1; push_attempt=1
 
-  _popd || exit 1
+  until [[ ${push_response} -eq 0 ]] || [[ ${push_attempt} -gt 5 ]]; do
+    ${git} add . \
+      && ${git} commit -a -m "BUILD: ${ts_date}" \
+      && ${git} push
+
+    push_response=$?; push_attempt=$(( push_attempt + 1 ))
+    [[ ${push_response} -ne 0 ]] && ${sleep} 5
+  done
+
+  # Exit if git push error.
+  if [[ ${push_response} -ne 0 ]] && [[ ${push_attempt} -gt 5 ]]; then
+    echo "ERROR: Git push error!"
+    exit ${push_response}
+  fi
+
+  ${sleep} 2; _popd || exit 1
 }
 
 # -------------------------------------------------------------------------------------------------------------------- #
@@ -157,13 +181,13 @@ _popd() {
   command popd > /dev/null || exit 1
 }
 
-# Timestamp.
-_timestamp() {
+# Timestamp: Date.
+_ts_date() {
   ${date} -u '+%Y-%m-%d %T'
 }
 
-# TAR version.
-_version() {
+# Timestamp: Version.
+_ts_ver() {
   ${date} -u '+%Y-%m-%d.%H-%M-%S'
 }
 
