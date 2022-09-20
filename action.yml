@@ -1,5 +1,5 @@
 name: "TAR Builder"
-author: "z17 CX <mail@z17.cx>"
+author: "z17 Development <mail@z17.dev>"
 description: "GitHub Action for build TAR."
 branding:
   icon: "archive"
