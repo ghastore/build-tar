@@ -27,7 +27,7 @@ tar="$( command -v tar )"
 d_src="/root/git/repo_src"
 d_dst="/root/git/repo_dst"
 
-# Git config.
+# Git.
 ${git} config --global user.name "${GIT_USER}"
 ${git} config --global user.email "${GIT_EMAIL}"
 ${git} config --global init.defaultBranch 'main'
@@ -37,11 +37,9 @@ ${git} config --global init.defaultBranch 'main'
 # -------------------------------------------------------------------------------------------------------------------- #
 
 init() {
-  # Functions.
   ts_date="$( _ts_date )"
   ts_ver="$( _ts_ver )"
 
-  # Run.
   clone \
     && pack \
     && move \
